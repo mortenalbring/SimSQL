@@ -1,0 +1,118 @@
+<html>
+  <head>
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script type="text/javascript">
+	//This script takes an input file submitted by a user and plots it using the google charts API
+	//20130528 Morten Albring
+	var reader; 
+	reader = new FileReader();
+	function readText(filePath) {
+	var output = ""; 
+        if(filePath.files && filePath.files[0]) {           
+            reader.onload = function (e) {
+                output = e.target.result;
+                displayContents(output);
+            };
+            reader.readAsText(filePath.files[0]);
+        }
+        return true;
+    }   
+    function displayContents(txt) {
+		var txt_lines = txt.split('\n');
+		var number_of_lines = txt_lines.length;		
+		
+		//Initatilising arrays
+		//First column is field values
+		//Second column is absorption values
+		//Third colum is going to be the first derivative of col 2 wrt col 1
+		var firstCol = new Array();
+		var secondCol = new Array();
+		var thirdCol = new Array();
+		
+		//Initialising google visualisation
+		var data = new google.visualization.DataTable();
+		data.addColumn('number','x');
+		data.addColumn('number','y');
+		data.addRows(number_of_lines);
+		
+		str = "";
+		for (var i=0;i<number_of_lines;i++) {
+		//Lines and parsed into columns by specific formatting of my data
+		//Probably a more robust, more general way of doing this
+		firstCol[i] = parseFloat(txt_lines[i].substring(0,25));
+		secondCol[i] = parseFloat(txt_lines[i].substring(27,44));
+		if (i > 1) {
+		//Calcualtes derivative
+		thirdCol[i] = ((secondCol[i] - secondCol[i-1]) / (firstCol[i] - firstCol[i-1]));
+		}
+		else {
+		thirdCol[i] = 0;
+		}
+		//Puts this data into the cells for Google charts to do its thing
+		data.setCell(i,0,firstCol[i]);
+		data.setCell(i,1,thirdCol[i]);
+		str += firstCol[i] + "," + secondCol[i] + "<br>";
+		}
+		
+
+        var options = {
+          title: 'EPR spectrum',
+          hAxis: {title: 'Field', minValue: 0, maxValue: 2},
+          vAxis: {title: 'Intensity', minValue: -35, maxValue: 35},
+          legend: 'none'
+        };		
+		
+		//Draw data to screen
+        var chart = new google.visualization.ScatterChart(document.getElementById('chart_div'));
+        chart.draw(data, options);
+		
+        var el = document.getElementById('main'); 
+        el.innerHTML = str; //display output in DOM
+    }   
+
+	//This is gubbins that comes with the google charts API as an example
+	//I keep it here so I can fiddle with formatting and stuff
+      google.load("visualization", "1", {packages:["corechart"]});
+      google.setOnLoadCallback(drawChart);
+      function drawChart() {
+	  var data = new google.visualization.DataTable();
+	  data.addColumn('number','x');
+	  data.addColumn('number','y');
+	  data.addRows(5);
+	  
+	  data.setCell(0,0,1.1);
+	  data.setCell(0,1,7);
+	  data.setCell(1,0,1.5);
+	  data.setCell(1,1,8);
+	  data.setCell(2,0,3.5);
+	  data.setCell(2,1,5);
+	  data.setCell(3,0,4);
+	  data.setCell(3,1,2);
+	  data.setCell(4,0,5);
+	  data.setCell(4,1,2);
+	  
+        var options = {
+          title: 'Age vs. Weight comparison',
+          hAxis: {title: 'Age', minValue: 0, maxValue: 15},
+          vAxis: {title: 'Weight', minValue: 0, maxValue: 15},
+          legend: 'none'
+        };
+
+        var chart = new google.visualization.ScatterChart(document.getElementById('chart_div'));
+        chart.draw(data, options);
+      }
+    </script>
+  </head>
+  <body>
+    <div id="chart_div" style="width: 900px; height: 500px;"></div>
+	    <div id="container">    
+        <input type="file" onchange='readText(this)' />
+        <br/>
+        <hr/>   
+        <h3>Contents of the Text file:</h3>
+        <div id="main">
+            ...
+        </div>
+    </div>
+  </body>
+</html>
