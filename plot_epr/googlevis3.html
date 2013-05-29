@@ -1,0 +1,50 @@
+<html>
+  <head>
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script type="text/javascript">
+	//This is gubbins that comes with the google charts API as an example
+	//I keep it here so I can fiddle with formatting and stuff
+      google.load("visualization", "1", {packages:["corechart"]});
+      google.setOnLoadCallback(drawChart);
+      function drawChart() {
+	  var data = new google.visualization.DataTable();
+	  data.addColumn('number','x');
+	  data.addColumn('number','y');
+	  data.addRows(5);
+	  
+	  data.setCell(0,0,1.1);
+	  data.setCell(0,1,7);
+	  data.setCell(1,0,1.5);
+	  data.setCell(1,1,8);
+	  data.setCell(2,0,3.5);
+	  data.setCell(2,1,5);
+	  data.setCell(3,0,4);
+	  data.setCell(3,1,2);
+	  data.setCell(4,0,5);
+	  data.setCell(4,1,2);
+	  
+        var options = {
+          title: 'Age vs. Weight comparison',
+          hAxis: {title: 'Age', minValue: 0, maxValue: 15},
+          vAxis: {title: 'Weight', minValue: 0, maxValue: 15},
+          legend: 'none'
+        };
+
+        var chart = new google.visualization.ScatterChart(document.getElementById('chart_div'));
+        chart.draw(data, options);
+      }
+    </script>
+  </head>
+  <body>
+    <div id="chart_div" style="width: 900px; height: 500px;"></div>
+	    <div id="container">    
+        <input type="file" onchange='readText(this)' />
+        <br/>
+        <hr/>   
+        <h3>Contents of the Text file:</h3>
+        <div id="main">
+            ...
+        </div>
+    </div>
+  </body>
+</html>
